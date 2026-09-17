@@ -1,4 +1,29 @@
-export default function LoginPage() {
+"use client";
+
+import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+
+function LoginForm() {
+  const router = useRouter();
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (email !== "admin@example.com" || password !== "admin") {
+      setError("Incorrect email or password. Please try again.");
+      return;
+    }
+
+    setError("");
+    login({ name: "Admin", email });
+    router.push("/dashboard");
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
       <section
@@ -12,7 +37,7 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-slate-600">Welcome back</p>
         </div>
 
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-700">
               Email address
@@ -23,6 +48,10 @@ export default function LoginPage() {
               type="email"
               autoComplete="email"
               placeholder="email@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              aria-describedby={error ? "login-error" : undefined}
+              required
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
@@ -37,9 +66,19 @@ export default function LoginPage() {
               type="password"
               autoComplete="current-password"
               placeholder="Enter your password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              aria-describedby={error ? "login-error" : undefined}
+              required
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
+
+          {error && (
+            <p id="login-error" role="alert" className="text-sm text-red-600">
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"
@@ -51,4 +90,8 @@ export default function LoginPage() {
       </section>
     </main>
   );
+}
+
+export default function LoginPage() {
+  return <LoginForm />;
 }
